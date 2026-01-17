@@ -2,7 +2,8 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Fish Prediction</title>
+    <title>Check</title>
+    <link rel="stylesheet" href="style.css">
 
     <style>
         /* ซ่อน input file */
@@ -11,76 +12,90 @@
         }
 
         /* ปุ่มเลือกภาพ */
-        label {
+        label.upload-btn {
             padding: 10px 20px;
             background-color: #4CAF50;
             color: white;
             cursor: pointer;
             border-radius: 5px;
+            display: inline-block;
         }
     </style>
 </head>
+
 <body>
 
-    <h2>ทำนายภาพปลา</h2>
+<nav>
+    <a href="index.html">Home</a>
+    <a href="check.html">Check</a>
+    <a href="about.html">About Us</a>
+</nav>
 
-    <!-- ปุ่มเลือกภาพ -->
-    <label for="imageUpload">เลือกภาพ</label>
-    <input type="file" id="imageUpload" accept="image/*" onchange="loadImage(event)">
+<div class="main-content">
+    <div class="box">
+        <h1>Check</h1>
+        <p>หน้านี้ใช้สำหรับตรวจสอบข้อมูล</p>
 
-    <br><br>
+        <h2>ทำนายภาพปลา</h2>
 
-    <!-- แสดงผลลัพธ์ -->
-    <div id="result"></div>
+        <!-- ปุ่มเลือกภาพ -->
+        <label for="imageUpload" class="upload-btn">เลือกภาพ</label>
+        <input type="file" id="imageUpload" accept="image/*" onchange="loadImage(event)">
 
-    <!-- TensorFlow และ Teachable Machine -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+        <br><br>
 
-    <script>
-        const URL = "https://teachablemachine.withgoogle.com/models/6rxh3zyDi/";
-        let model;
+        <!-- แสดงผลลัพธ์ -->
+        <div id="result"></div>
+    </div>
+</div>
 
-        // โหลดโมเดลอัตโนมัติ
-        async function init() {
-            const modelURL = URL + "model.json";
-            const metadataURL = URL + "metadata.json";
-            model = await tmImage.load(modelURL, metadataURL);
-        }
+<!-- TensorFlow และ Teachable Machine -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 
-        // อ่านรูปภาพด้วย FileReader
-        function loadImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+<script>
+    const URL = "https://teachablemachine.withgoogle.com/models/6rxh3zyDi/";
+    let model;
 
-            const reader = new FileReader();
-            reader.onload = function () {
-                const img = new Image();
-                img.src = reader.result;
-                img.onload = () => predict(img);
-            };
-            reader.readAsDataURL(file);
-        }
+    // โหลดโมเดลอัตโนมัติ
+    async function init() {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+        model = await tmImage.load(modelURL, metadataURL);
+    }
 
-        // ทำนายและเลือกเฉพาะค่าที่สูงที่สุด
-        async function predict(image) {
-            const predictions = await model.predict(image);
+    // อ่านรูปภาพด้วย FileReader (ไม่แสดงภาพ)
+    function loadImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
-            let bestPrediction = predictions[0];
+        const reader = new FileReader();
+        reader.onload = function () {
+            const img = new Image();
+            img.src = reader.result;
+            img.onload = () => predict(img);
+        };
+        reader.readAsDataURL(file);
+    }
 
-            for (let i = 1; i < predictions.length; i++) {
-                if (predictions[i].probability > bestPrediction.probability) {
-                    bestPrediction = predictions[i];
-                }
+    // แสดงเฉพาะคลาสที่มีค่าความน่าจะเป็นสูงสุด
+    async function predict(image) {
+        const predictions = await model.predict(image);
+
+        let best = predictions[0];
+        for (let i = 1; i < predictions.length; i++) {
+            if (predictions[i].probability > best.probability) {
+                best = predictions[i];
             }
-
-            document.getElementById("result").innerHTML =
-                `คลาส: ${bestPrediction.className}<br>
-                 ความน่าจะเป็น: ${bestPrediction.probability.toFixed(2)}`;
         }
 
-        init();
-    </script>
+        document.getElementById("result").innerHTML =
+            `คลาส: ${best.className}<br>
+             ความน่าจะเป็น: ${best.probability.toFixed(2)}`;
+    }
+
+    init();
+</script>
 
 </body>
 </html>
