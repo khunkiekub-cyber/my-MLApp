@@ -1,0 +1,53 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* เมนู */
+nav {
+  background: #333;
+  padding: 10px;
+  text-align: center;
+}
+
+nav a {
+  color: white;
+  margin: 0 15px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* จัดเนื้อหาให้อยู่กลางหน้า */
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;   /* กลางแนวนอน */
+  align-items: center;       /* กลางแนวตั้ง */
+  text-align: center;
+  padding: 20px;
+}
+
+/* กล่องเนื้อหา */
+.box {
+  max-width: 600px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  nav a {
+    display: block;
+    margin: 10px 0;
+  }
+}
